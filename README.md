@@ -1,9 +1,9 @@
 # pyGeniusOne
-Experimental python implementation of some of the nGeniusOne statistics algorithms
+Experimental python implementation of some of the nGeniusOne statistics calculations
 
 ## Description
 This program takes a pcap file as input and calculates network statistics (see below) from the given packet trace in 
-chunks of 5 minutes.
+chunks of 5 minutes. It will output this to STDOUT or a file in JSON format.
 These statistics are calculated using the nGeniusOne algorithms. The software can be used to compare capture data from 
 a probe system directly to detect irregularities in nGeniousOne.
 
@@ -18,25 +18,25 @@ a probe system directly to detect irregularities in nGeniousOne.
 	- ```userplane_[upload|download]_active_millis```
 	    - total time during which bytes were being transmitted in upload/download direction.
 	- ```userplane_[upload|download]_effective_bytes_count```
-	    - ammount of transmitted bytes in upload/download direction. Includes only GTP payload.
-	    (so only user data)
+	    - ammount of transmitted bytes in upload/download direction. Includes only GTP-U payload.
+	    (only the user data sent through the tunnel)
     - ```userplane_[upload|download]_max_throughput_kbps```
         - highest throughput reached during the interval in upload/download direction.
     
-### Underlying algorithms
+### Underlying calculations
 #### Additional definitions
 - **Delta time**
-    - The time between two packets in the same flow. (sender <-> receiver)
+    - The time between two packets in the trace.
 - **Silence period**
     - Treshold to determine which data to report as active time. If the delta between two packets
     exceeds 4 seconds, this will be interpreted as silence; instead of counting the full delta as active time, nGeniousOne
-    will report only one microsecond. (presumeably to account for the average time of a terminating syn-ack?)
+    will report only one millisecond.
 - **Minimum report time**
     - The time that will be reported as delta time when the actual delta time exceeds 4 seconds.
 - **Resolution time**
     - The time unit that will be used to express the active time. The resolution time defaults to 1 second.
 - **Throughput**
-    - Throughput is calculated everytime the (total?) delta time exceeds the resolution time (1 second)
+    - Throughput is calculated everytime the total active time exceeds the resolution time (1 second).
 
 #### Algorithms
 
@@ -66,5 +66,45 @@ return activeTime
 ```
 
 ## Usage
-it doesn't exist :D
+```
+pygeniousone [options] filename.pcap
+```
+### Options
 
+By default pyGeniusOne will output all available statistics. You can use these options to limit the output to a subset of
+stats.
+
+```
+-C, --count-packets
+```
+Include userplane_[upload|download]_bytes_count in output.
+```
+-c, --count-bytes
+```
+Include userplane_[upload|download]_bytes_count in output.
+```
+-e, --effective-bytes
+```
+Include userplane_[upload|download]_bytes_count in output.
+```
+-a, --active-millis
+```
+Include userplane_[upload|download]_bytes_count in output.
+```
+-t, --max-throughput
+```
+Include userplane_[upload|download]_bytes_count in output.
+```
+-u, --up
+```
+Specify direction of traffic. 
+```
+-d, --down
+```
+Specify direction of traffic.
+```
+-f
+```
+Specify file to write output to.
+#### Notes
+The usage of -u or -d is mandatory and cannot be omitted.
