@@ -71,13 +71,13 @@ pygeniousone [options] filename.pcap
 ```
 ### Options
 
-By default pyGeniusOne will output all available statistics. You can use these options to limit the output to a subset of
-stats.
+By default pyGeniusOne will output all available statistics with default parameters. You can use these options to limit the output to a subset of
+stats or change the calculation parameters.
 
 ```
 -C, --count-packets
 ```
-Include userplane_[upload|download]_bytes_count in output.
+Include userplane_[upload|download]_packets_count in output.
 ```
 -c, --count-bytes
 ```
@@ -85,15 +85,27 @@ Include userplane_[upload|download]_bytes_count in output.
 ```
 -e, --effective-bytes
 ```
-Include userplane_[upload|download]_bytes_count in output.
+Include userplane_[upload|download]_effective_bytes_count in output.
 ```
 -a, --active-millis
 ```
-Include userplane_[upload|download]_bytes_count in output.
+Include userplane_[upload|download]_active_millis in output.
 ```
 -t, --max-throughput
 ```
-Include userplane_[upload|download]_bytes_count in output.
+Include userplane_[upload|download]_max_throughput in output.
+```
+--resolution-time
+```
+Resolution time (see above)
+```
+--silence-period
+```
+Silence period (see above)
+```
+--minimum-report-time
+```
+Minimum report time (see above)
 ```
 -u, --up
 ```
