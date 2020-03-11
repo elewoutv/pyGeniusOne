@@ -103,6 +103,10 @@ Specify direction of traffic.
 ```
 Specify direction of traffic.
 ```
+-i --ip-adress x.x.x.x
+```
+This adress will be used to determine the meaning of the -up and -down options
+```
 -f
 ```
 Specify file to write output to.
