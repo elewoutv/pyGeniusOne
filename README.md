@@ -2,10 +2,10 @@
 Experimental python implementation of some of the nGeniusOne statistics calculations
 
 ## Description
-This program takes a pcap file as input and calculates network statistics (see below) from the given packet trace in 
+This program takes a pcap file as input and calculates subscriber session statistics (see below) from the given packet trace in 
 chunks of 5 minutes. It will output this to STDOUT or a file in JSON format.
-These statistics are calculated using the nGeniusOne algorithms. The software can be used to compare capture data from 
-a probe system directly to detect irregularities in nGeniousOne.
+These statistics are calculated using the netScout algorithms. The software can be used to compare capture data from 
+a probe system directly to detect irregularities in bigdata feed output.
 
 ### nGeniusOne available statistics
 - **available**
