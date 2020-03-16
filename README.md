@@ -1,5 +1,5 @@
 # pyGeniusOne
-Experimental python implementation of some of the nGeniusOne statistics calculations
+Experimental python implementation of some of the netScout statistics calculations
 
 ## Description
 This program takes a pcap file as input and calculates subscriber session statistics (see below) from the given packet trace in 
@@ -109,18 +109,16 @@ Minimum report time (see above)
 ```
 -u, --up
 ```
-Specify direction of traffic. 
+Calculate only upload statistics.
 ```
 -d, --down
 ```
-Specify direction of traffic.
+Calculate only download statistics.
 ```
 -i --ip-adress x.x.x.x
 ```
-This adress will be used to determine the meaning of the -up and -down options
+The address of the server (the receiver)
 ```
 -f
 ```
 Specify file to write output to.
-#### Notes
-The usage of -u or -d is mandatory and cannot be omitted.
