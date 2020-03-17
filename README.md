@@ -117,7 +117,8 @@ Calculate only download statistics.
 ```
 -i --ip-adress x.x.x.x
 ```
-The address of the server (the receiver)
+The address of the subscriber (the client). This is used to determine which packets to count in "upload" and "download"
+direction.
 ```
 -f
 ```
