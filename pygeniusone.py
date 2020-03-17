@@ -17,7 +17,37 @@ MINIMUM_REPORT_TIME_DEFAULT = 1
 
 def main():
 
+    # Read user arguments from the commandline
     parser = argparse.ArgumentParser(description='Calculate netScout subscriber session statistics')
+    check_commandline_params(parser)
+    args = parser.parse_args()
+
+    # Get silence period
+    silence_period = args.silence_period
+
+    # Get minimum report time
+    min_report_time = args.min_report_time
+
+    # Get resolution time
+    resolution_time = args.resolution_time
+
+    # Get subscriber ip
+    if is_ip_address(args.ip):
+        subscriber_ip = args.ip
+    else:
+        sys.exit("ERROR: invalid ip address")
+
+    # Get capture file location
+    if file_exists(args.pcap):
+        pcap = args.pcap
+    else:
+        sys.exit("ERROR: invalid pcap file")
+
+    cap = pyshark.FileCapture(pcap)
+    print(cap[0])
+
+
+def check_commandline_params(parser):
     # Optional arguments
     parser.add_argument('-f',
                         help="file to write output to")
@@ -57,7 +87,7 @@ def main():
     # Output arguments
     output_group = parser.add_argument_group(title="output options",
                                              description="pyGeniousOne will output all available statistics by default,"
-                                             " you can limit the output with these options")
+                                                         " you can limit the output with these options")
     output_group.add_argument('-C', '--count-packets',
                               help="Include packet count in output",
                               default=False,
@@ -83,31 +113,6 @@ def main():
                               default=False,
                               dest='maxThroughput',
                               action="store_true")
-    args = parser.parse_args()
-
-    # Get silence period
-    silence_period = args.silence_period
-
-    # Get minimum report time
-    min_report_time = args.min_report_time
-
-    # Get resolution time
-    resolution_time = args.resolution_time
-
-    # Get subscriber
-    if is_ip_address(args.ip):
-        subscriber_ip = args.ip
-    else:
-        sys.exit("ERROR: invalid ip address")
-
-    # Get capture file location
-    if file_exists(args.pcap):
-        pcap = args.pcap
-    else:
-        sys.exit("ERROR: invalid pcap file")
-
-    cap = pyshark.FileCapture(pcap)
-    print(cap[0])
 
 
 def file_exists(file):
@@ -127,42 +132,3 @@ def is_ip_address(ip):
 
 
 main()
-
-
-# Check options
-# Set options
-# Parse packets
-# Subdivide packets in chunks of 5 min.
-
-# Calculate byte count
-# count = 0
-# foreach packet in packets
-# if (packet.direction() == direction)
-# count += packet.length()
-# return count
-
-# Calculate packet count
-# return packets.length()
-
-# Calculate active milliseconds
-# activeTime = 0
-# foreach packet in packets
-# if (packet.direction() == direction)
-# delta = packets.calculateDeltaTime(packet)
-# if (delta > silence period)
-# delta = 1 ms
-# activeTime += delta
-# return activeTime
-
-# Calculate effective bytes
-# count = 0
-# foreach packet in packets
-# if (packet.direction() == direction)
-# count += packet.payload.length()
-# return count
-
-# Calculate max throughput
-# throughputs[] = new []
-# cumulative active time = 0
-# foreach packet in packets
-#
