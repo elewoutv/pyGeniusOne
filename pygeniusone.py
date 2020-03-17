@@ -6,6 +6,7 @@
 
 import argparse
 import ipaddress
+import sys
 
 # Calculation parameter defaults
 RESOLUTION_TIME_DEFAULT = 1000
@@ -51,7 +52,6 @@ def main():
     required_group.add_argument('-i', '--ip-adress',
                                 help="ip adress of the subsciber (the client)",
                                 dest='ip',
-                                type=is_ip_address(),
                                 required=True)
     # Output arguments
     output_group = parser.add_argument_group(title="output options",
@@ -85,24 +85,27 @@ def main():
     args = parser.parse_args()
 
     # Get silence period
-    silence_period = args.silencePeriod
+    silence_period = args.silence_period
 
     # Get minimum report time
-    min_report_time = args.minReportTime
+    min_report_time = args.min_report_time
 
     # Get resolution time
-    resolution_time = args.resolutionTime
+    resolution_time = args.resolution_time
 
     # Get subscriber
-    subscriber_ip = args.ip
+    if is_ip_address(args.ip):
+        subscriber_ip = args.ip
+    else:
+        sys.exit("ERROR: invalid ip address")
 
 
 def is_ip_address(ip):
     try:
         check_ip = ipaddress.ip_address(ip)
-        return ip
+        return True
     except ValueError:
-        raise argparse.ArgumentTypeError("invalid ip address")
+        return False
 
 
 main()
