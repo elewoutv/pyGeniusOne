@@ -5,6 +5,7 @@
 #
 
 import argparse
+import ipaddress
 
 # Calculation parameter defaults
 RESOLUTION_TIME_DEFAULT = 1000
@@ -48,8 +49,9 @@ def main():
                         help="subscriber session pcap file")
     required_group = parser.add_argument_group(title="required arguments")
     required_group.add_argument('-i', '--ip-adress',
-                                help="ip adress of the server (the receiver)",
+                                help="ip adress of the subsciber (the client)",
                                 dest='ip',
+                                type=is_ip_address(),
                                 required=True)
     # Output arguments
     output_group = parser.add_argument_group(title="output options",
@@ -91,11 +93,22 @@ def main():
     # Get resolution time
     resolution_time = args.resolutionTime
 
+    # Get subscriber
+    subscriber_ip = args.ip
+
+
+def is_ip_address(ip):
+    try:
+        check_ip = ipaddress.ip_address(ip)
+        return ip
+    except ValueError:
+        raise argparse.ArgumentTypeError("invalid ip address")
+
 
 main()
 
-# Set direction to calculate
-# Set receiver IP
+
+# Set subscriber IP
 # Check options
 # Set options
 # Parse packets
