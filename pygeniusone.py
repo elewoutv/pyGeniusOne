@@ -7,6 +7,7 @@
 import argparse
 import ipaddress
 import sys
+import pyshark
 
 # Calculation parameter defaults
 RESOLUTION_TIME_DEFAULT = 1000
@@ -46,7 +47,7 @@ def main():
                         dest='down',
                         action="store_true")
     # Required arguments
-    parser.add_argument('filename.pcap',
+    parser.add_argument('pcap',
                         help="subscriber session pcap file")
     required_group = parser.add_argument_group(title="required arguments")
     required_group.add_argument('-i', '--ip-adress',
@@ -99,6 +100,23 @@ def main():
     else:
         sys.exit("ERROR: invalid ip address")
 
+    # Get capture file location
+    if file_exists(args.pcap):
+        pcap = args.pcap
+    else:
+        sys.exit("ERROR: invalid pcap file")
+
+    cap = pyshark.FileCapture(pcap)
+    print(cap[0])
+
+
+def file_exists(file):
+    try:
+        open(file)
+        return True
+    except IOError:
+        return False;
+
 
 def is_ip_address(ip):
     try:
@@ -111,7 +129,6 @@ def is_ip_address(ip):
 main()
 
 
-# Set subscriber IP
 # Check options
 # Set options
 # Parse packets
