@@ -5,21 +5,16 @@
 #
 
 import argparse
-import ipaddress
 import sys
 import pyshark
-
-# Calculation parameter defaults
-RESOLUTION_TIME_DEFAULT = 1000
-SILENCE_PERIOD_DEFAULT = 4
-MINIMUM_REPORT_TIME_DEFAULT = 1
+import helpers
 
 
 def main():
 
     # Read user arguments from the commandline
     parser = argparse.ArgumentParser(description='Calculate netScout subscriber session statistics')
-    check_commandline_params(parser)
+    helpers.check_commandline_params(parser)
     args = parser.parse_args()
 
     # Get silence period
@@ -32,103 +27,19 @@ def main():
     resolution_time = args.resolution_time
 
     # Get subscriber ip
-    if is_ip_address(args.ip):
+    if helpers.is_ip_address(args.ip):
         subscriber_ip = args.ip
     else:
         sys.exit("ERROR: invalid ip address")
 
     # Get capture file location
-    if file_exists(args.pcap):
+    if helpers.file_exists(args.pcap):
         pcap = args.pcap
     else:
         sys.exit("ERROR: invalid pcap file")
 
     cap = pyshark.FileCapture(pcap)
     print(cap[0])
-
-
-def check_commandline_params(parser):
-    # Optional arguments
-    parser.add_argument('-f',
-                        help="file to write output to")
-    parser.add_argument('--resolution-time',
-                        type=int,
-                        default=RESOLUTION_TIME_DEFAULT,
-                        dest='resolution_time',
-                        help="resolution time in ms")
-    parser.add_argument('--silence-period',
-                        type=int,
-                        default=SILENCE_PERIOD_DEFAULT,
-                        dest='silence_period',
-                        help="silence period time in s")
-    parser.add_argument('--minimum-report-time',
-                        type=int,
-                        default=MINIMUM_REPORT_TIME_DEFAULT,
-                        dest='min_report_time',
-                        help="minimum report time in ms")
-    parser.add_argument('-u', '--up',
-                        help="calculate only upload stats",
-                        default=False,
-                        dest='up',
-                        action="store_true")
-    parser.add_argument('-d', '--down',
-                        help="calculate only download stats",
-                        default=False,
-                        dest='down',
-                        action="store_true")
-    # Required arguments
-    parser.add_argument('pcap',
-                        help="subscriber session pcap file")
-    required_group = parser.add_argument_group(title="required arguments")
-    required_group.add_argument('-i', '--ip-adress',
-                                help="ip adress of the subsciber (the client)",
-                                dest='ip',
-                                required=True)
-    # Output arguments
-    output_group = parser.add_argument_group(title="output options",
-                                             description="pyGeniousOne will output all available statistics by default,"
-                                                         " you can limit the output with these options")
-    output_group.add_argument('-C', '--count-packets',
-                              help="Include packet count in output",
-                              default=False,
-                              dest='packetCount',
-                              action="store_true")
-    output_group.add_argument('-c', '--count-bytes',
-                              help="Include total byte count in output",
-                              default=False,
-                              dest='bytes',
-                              action="store_true")
-    output_group.add_argument('-e', '--effective-bytes',
-                              help="Include GTP-U byte count in output",
-                              default=False,
-                              dest='effectieBytes',
-                              action="store_true")
-    output_group.add_argument('-a', '--active-millis',
-                              help="Include total transmission time in a specific direction in output",
-                              default=False,
-                              dest='activeMillis',
-                              action="store_true")
-    output_group.add_argument('-t', '--max-throughput',
-                              help="Include highest throughput reached in specific direction in output",
-                              default=False,
-                              dest='maxThroughput',
-                              action="store_true")
-
-
-def file_exists(file):
-    try:
-        with open(file):
-            return True
-    except IOError:
-        return False
-
-
-def is_ip_address(ip):
-    try:
-        check_ip = ipaddress.ip_address(ip)
-        return True
-    except ValueError:
-        return False
 
 
 main()
