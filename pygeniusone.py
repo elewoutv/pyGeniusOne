@@ -117,10 +117,10 @@ def check_commandline_params(parser):
 
 def file_exists(file):
     try:
-        open(file)
-        return True
+        with open(file):
+            return True
     except IOError:
-        return False;
+        return False
 
 
 def is_ip_address(ip):
