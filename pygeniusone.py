@@ -6,7 +6,7 @@
 
 import argparse
 import sys
-import pyshark
+import scapy
 import helpers
 
 
@@ -37,9 +37,6 @@ def main():
         pcap = args.pcap
     else:
         sys.exit("ERROR: invalid pcap file")
-
-    cap = pyshark.FileCapture(pcap)
-    print(cap[0])
 
 
 main()
