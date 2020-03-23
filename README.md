@@ -9,12 +9,11 @@ a probe system directly to detect irregularities in bigdata feed output.
 
 ### nGeniusOne available statistics
 - **available**
-	- none
+	- ```userplane_[upload|download]_packets_count```
+	    - ammount of transmitted packets in upload/download direction.
 - **planned**
 	- ```userplane_[upload|download]_bytes_count```
 	    - ammount of transmitted bytes in upload/download direction. Includes all GTP traffic.
-	- ```userplane_[upload|download]_packets_count```
-	    - ammount of transmitted packets in upload/download direction.
 	- ```userplane_[upload|download]_active_millis```
 	    - total time during which bytes were being transmitted in upload/download direction.
 	- ```userplane_[upload|download]_effective_bytes_count```
@@ -72,7 +71,7 @@ pygeniousone [options] filename.pcap
 ### Options
 
 By default pyGeniusOne will output all available statistics with default parameters. You can use these options to limit the output to a subset of
-stats or change the calculation parameters.
+stats or change the calculation parameters. NOT IMPLEMENTED
 
 ```
 -C, --count-packets

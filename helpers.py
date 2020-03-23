@@ -46,34 +46,34 @@ def check_commandline_params(parser):
                                 dest='ip',
                                 required=True)
     # Output arguments
-    output_group = parser.add_argument_group(title="output options",
-                                             description="pyGeniousOne will output all available statistics by default,"
-                                                         " you can limit the output with these options")
-    output_group.add_argument('-C', '--count-packets',
-                              help="Include packet count in output",
-                              default=False,
-                              dest='packetCount',
-                              action="store_true")
-    output_group.add_argument('-c', '--count-bytes',
-                              help="Include total byte count in output",
-                              default=False,
-                              dest='bytes',
-                              action="store_true")
-    output_group.add_argument('-e', '--effective-bytes',
-                              help="Include GTP-U byte count in output",
-                              default=False,
-                              dest='effectieBytes',
-                              action="store_true")
-    output_group.add_argument('-a', '--active-millis',
-                              help="Include total transmission time in a specific direction in output",
-                              default=False,
-                              dest='activeMillis',
-                              action="store_true")
-    output_group.add_argument('-t', '--max-throughput',
-                              help="Include highest throughput reached in specific direction in output",
-                              default=False,
-                              dest='maxThroughput',
-                              action="store_true")
+    # output_group = parser.add_argument_group(title="output options",
+    #                                          description="pyGeniousOne will output all available statistics by default,"
+    #                                                      " you can limit the output with these options")
+    # output_group.add_argument('-C', '--count-packets',
+    #                           help="Include packet count in output",
+    #                           default=False,
+    #                           dest='packetCount',
+    #                           action="store_true")
+    # output_group.add_argument('-c', '--count-bytes',
+    #                           help="Include total byte count in output",
+    #                           default=False,
+    #                           dest='bytes',
+    #                           action="store_true")
+    # output_group.add_argument('-e', '--effective-bytes',
+    #                           help="Include GTP-U byte count in output",
+    #                           default=False,
+    #                           dest='effectieBytes',
+    #                           action="store_true")
+    # output_group.add_argument('-a', '--active-millis',
+    #                           help="Include total transmission time in a specific direction in output",
+    #                           default=False,
+    #                           dest='activeMillis',
+    #                           action="store_true")
+    # output_group.add_argument('-t', '--max-throughput',
+    #                           help="Include highest throughput reached in specific direction in output",
+    #                           default=False,
+    #                           dest='maxThroughput',
+    #                           action="store_true")
 
 
 def file_exists(file):
