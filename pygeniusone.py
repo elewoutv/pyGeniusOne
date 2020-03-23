@@ -6,7 +6,7 @@
 
 import argparse
 import sys
-import scapy
+from scapy.all import *
 import helpers
 
 
@@ -37,6 +37,28 @@ def main():
         pcap = args.pcap
     else:
         sys.exit("ERROR: invalid pcap file")
+
+    # The netscout calculations expect chunks of 5 minutes so we subdivide the pcap in chunks of 5 minutes
+    # Each interval is 5 minutes. Currently hardcoded
+    interval_time = 300.00
+
+    pkts = rdpcap(pcap)
+    pcap_chunks = []
+
+    chunk_counter = 0
+    chunk_start_time = pkts[0].time
+
+    for pkt in pkts:
+        # pkt.time is time since epoch
+        if pkt.time - chunk_start_time < interval_time:
+            try:
+                pcap_chunks[chunk_counter].append(pkt)
+            except IndexError:
+                pcap_chunks.append([pkt])
+        else:
+            chunk_counter += 1
+            chunk_start_time = pkt.time
+            pcap_chunks.append([pkt])
 
 
 main()
