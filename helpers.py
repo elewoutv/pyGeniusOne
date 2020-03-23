@@ -1,4 +1,5 @@
 import ipaddress
+from scapy.all import *
 
 
 def check_commandline_params(parser):
@@ -89,3 +90,29 @@ def is_ip_address(ip):
         return True
     except ValueError:
         return False
+
+
+# Takes a pcap file and divides it into chunks
+# @param pcap the pcap file to "chunkify"
+# @param chunk_duration the size/duration of each chunk in seconds. Best use a float for this parameter.
+# @return a list of lists of packets. Each sublist represents a chunk of chunk_duration seconds.
+#
+def divide_in_chunks(pcap, chunk_duration):
+    interval_time = chunk_duration
+    pkts = rdpcap(pcap)
+    pcap_chunks = []
+    chunk_counter = 0
+    chunk_start_time = pkts[0].time
+    for pkt in pkts:
+        # pkt.time is time since epoch
+        if pkt.time - chunk_start_time < interval_time:
+            try:
+                pcap_chunks[chunk_counter].append(pkt)
+            except IndexError:
+                pcap_chunks.append([pkt])
+        else:
+            chunk_counter += 1
+            chunk_start_time = pkt.time
+            pcap_chunks.append([pkt])
+
+    return pcap_chunks
