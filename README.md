@@ -16,9 +16,9 @@ a probe system directly to detect irregularities in bigdata feed output.
 	- ```userplane_[upload|download]_effective_bytes_count```
 	    - ammount of transmitted bytes in upload/download direction. Includes only GTP-U payload.
 	    (only the user data sent through the tunnel)
-- **planned**
 	- ```userplane_[upload|download]_active_millis```
 	    - total time during which bytes were being transmitted in upload/download direction.
+- **planned**
     - ```userplane_[upload|download]_max_throughput_kbps```
         - highest throughput reached during the interval in upload/download direction.
     
