@@ -99,7 +99,9 @@ def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_perio
         else:
             download_active_time += delta_time
 
+        # only now do we cast from decimal to integer to make the result as accurate as possible
+        upload_active_time = int(round(upload_active_time))
+        download_active_time = int(round(download_active_time))
+
     return {'userplane_upload_active_millis': upload_active_time,
             'userplane_download_active_millis': download_active_time}
-
-
