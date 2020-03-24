@@ -48,21 +48,15 @@ def main():
     for chunk in pcap_chunks:
 
         # Calculate userplane_download_packets_count and print a JSON
-        data = core.userplane_packets_count(chunk, subscriber_ip)
+        data = {}
+
+        data.update(core.userplane_packets_count(chunk, subscriber_ip))
+        data.update(core.userplane_bytes_count(chunk, subscriber_ip))
+
         print("chunk", chunk_count)
         print(json.dumps(data))
-        chunk_count += 1
 
-    upload_byte_count = 0
-    download_byte_count = 0
-    for chunk in pcap_chunks:
-        for pkt in chunk:
-            if pkt["IP"].src == subscriber_ip:
-                upload_byte_count += len(pkt)
-            else:
-                download_byte_count += len(pkt)
-        print(upload_byte_count)
-        print(download_byte_count)
+        chunk_count += 1
 
 
 main()
