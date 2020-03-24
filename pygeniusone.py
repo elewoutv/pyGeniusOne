@@ -48,42 +48,19 @@ def main():
 
     for chunk in pcap_chunks:
 
-        # Calculate userplane_download_packets_count and print a JSON
+        # Calculate stats and print a JSON
         data = {}
 
         data.update(core.userplane_packets_count(chunk, subscriber_ip))
         data.update(core.userplane_bytes_count(chunk, subscriber_ip))
         data.update(core.userplane_effective_bytes_count(chunk, subscriber_ip))
+        data.update(core.userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time))
 
         print("chunk", chunk_count)
         print(json.dumps(data))
 
         chunk_count += 1
 
-    for chunk in pcap_chunks:
-
-        upload_active_time = 0
-        download_active_time = 0
-
-        millisecond = 1000
-
-        for i in range(0, len(chunk)):
-            if i == 0:
-                delta_time = 0
-            else:
-                delta_time = chunk[i].time - chunk[i-1].time
-                delta_time = delta_time * millisecond
-
-            if delta_time > 4000:
-                delta_time = 1
-
-            if chunk[i]["IP"].src == subscriber_ip:
-                upload_active_time += delta_time
-            else:
-                download_active_time += delta_time
-
-        print(upload_active_time)
-        print(download_active_time)
-
 
 main()
+
