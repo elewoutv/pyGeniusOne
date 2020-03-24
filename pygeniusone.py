@@ -53,5 +53,16 @@ def main():
         print(json.dumps(data))
         chunk_count += 1
 
+    upload_byte_count = 0
+    download_byte_count = 0
+    for chunk in pcap_chunks:
+        for pkt in chunk:
+            if pkt["IP"].src == subscriber_ip:
+                upload_byte_count += len(pkt)
+            else:
+                download_byte_count += len(pkt)
+        print(upload_byte_count)
+        print(download_byte_count)
+
 
 main()
