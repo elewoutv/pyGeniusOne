@@ -37,7 +37,7 @@ def userplane_bytes_count(chunk, subscriber_ip):
         else:
             download_byte_count += len(pkt)
 
-    return {'userlane_upload_byte_count': upload_byte_count, 'userplane_download_byte_count': download_byte_count}
+    return {'userplane_upload_byte_count': upload_byte_count, 'userplane_download_byte_count': download_byte_count}
 
 
 # This function calculates the effective bytes (the GTP-U payload) sent in upload/download direction
