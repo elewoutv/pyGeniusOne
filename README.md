@@ -11,9 +11,9 @@ a probe system directly to detect irregularities in bigdata feed output.
 - **available**
 	- ```userplane_[upload|download]_packets_count```
 	    - ammount of transmitted packets in upload/download direction.
-- **planned**
 	- ```userplane_[upload|download]_bytes_count```
 	    - ammount of transmitted bytes in upload/download direction. Includes all GTP traffic.
+- **planned**
 	- ```userplane_[upload|download]_active_millis```
 	    - total time during which bytes were being transmitted in upload/download direction.
 	- ```userplane_[upload|download]_effective_bytes_count```
