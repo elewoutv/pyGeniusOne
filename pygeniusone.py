@@ -9,6 +9,7 @@ import argparse
 import helpers
 import core
 from scapy.all import *
+from scapy.contrib.gtp import *
 
 
 def main():
@@ -57,6 +58,20 @@ def main():
         print(json.dumps(data))
 
         chunk_count += 1
+
+    effective_bytes_upload_count = 0
+    effective_bytes_download_count = 0
+
+    for chunk in pcap_chunks:
+        for pkt in chunk:
+            if pkt["IP"].src == subscriber_ip:
+                effective_bytes_upload_count += len(pkt["GTP_U_Header"])
+            else:
+                effective_bytes_download_count += len(pkt["GTP_U_Header"])
+
+        print(effective_bytes_upload_count, effective_bytes_download_count)
+        effective_bytes_upload_count = 0
+        effective_bytes_download_count = 0
 
 
 main()
