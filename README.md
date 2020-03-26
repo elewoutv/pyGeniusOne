@@ -18,7 +18,6 @@ a probe system directly to detect irregularities in bigdata feed output.
 	    (only the user data sent through the tunnel)
 	- ```userplane_[upload|download]_active_millis```
 	    - total time during which bytes were being transmitted in upload/download direction.
-- **planned**
     - ```userplane_[upload|download]_max_throughput_kbps```
         - highest throughput reached during the interval in upload/download direction.
     
