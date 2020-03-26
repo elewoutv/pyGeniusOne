@@ -105,3 +105,67 @@ def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_perio
 
     return {'userplane_upload_active_millis': upload_active_time,
             'userplane_download_active_millis': download_active_time}
+
+
+# This function calculates the estimated highest throughput reached during a chunk in upload/download direction
+# @param chunk A list of packets from the desired time frame to perform calculations on.
+# @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param resolution_time The time unit to express the active_time parameter
+# @param silence_period Treshold to determine which delta's to report as active time
+# @param min_report_time Time that will be counted as active time when silence_period is exceeded
+# @return Returns a dictionary with results. Can easily be serialized to JSON.
+#
+def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip):
+
+    millseconds_in_second = 1000
+    bits_in_byte = 8
+
+    first_pkt = chunk[0]
+
+    # we use a list instead of a set because the pkt type is not hashable >:(
+    packets_for_throughput = []
+
+    upload_througputs = set()
+    download_throughputs = set()
+
+    for pkt in chunk:
+
+        packets_for_throughput.append(pkt)
+
+        # we calculate the througput roughly every time the resolution_time has passed
+        if pkt.time - first_pkt.time > resolution_time / millseconds_in_second:
+
+            # get the upload time and convert it to seconds
+            upload_time_sent_in_sec = userplane_active_millis(packets_for_throughput,
+                                                              subscriber_ip,
+                                                              resolution_time,
+                                                              silence_period,
+                                                              min_report_time).get(
+                'userplane_upload_active_millis') / millseconds_in_second
+
+            # get the effective bytes and convert it to Kb
+            upload_bytes_sent_in_kilobit = userplane_effective_bytes_count(packets_for_throughput,
+                                                                           subscriber_ip).get(
+                'userplane_upload_effective_byte_count') * bits_in_byte / millseconds_in_second
+
+            # same as above
+            download_time_sent_in_sec = userplane_active_millis(packets_for_throughput,
+                                                                subscriber_ip,
+                                                                resolution_time,
+                                                                silence_period,
+                                                                min_report_time).get(
+                'userplane_download_active_millis') / millseconds_in_second
+
+            # same as above
+            download_bytes_sent_in_kilobit = userplane_effective_bytes_count(packets_for_throughput,
+                                                                             subscriber_ip).get(
+                'userplane_download_effective_byte_count') * bits_in_byte / millseconds_in_second
+
+            # calculate result in kpbs
+            upload_througputs.add(upload_bytes_sent_in_kilobit / upload_time_sent_in_sec)
+            download_throughputs.add(download_bytes_sent_in_kilobit / download_time_sent_in_sec)
+
+            first_pkt = pkt
+
+    return {'userplane_upload_max_throughput_kbps': int(round(max(upload_througputs))),
+            'userplane_download_max_throughput_kbps': int(round(max(download_throughputs)))}

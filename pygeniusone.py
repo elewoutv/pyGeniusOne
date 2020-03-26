@@ -55,40 +55,12 @@ def main():
         data.update(core.userplane_bytes_count(chunk, subscriber_ip))
         data.update(core.userplane_effective_bytes_count(chunk, subscriber_ip))
         data.update(core.userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time))
+        data.update(core.userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip))
 
         print("chunk", chunk_count)
         print(json.dumps(data))
 
         chunk_count += 1
-
-    for chunk in pcap_chunks:
-        first_pkt = chunk[0]
-
-        # we use a list instead of a set because the pkt type is not hashable
-        packets_for_throughput = []
-
-        upload_througputs = set()
-        download_throughputs = set()
-
-        for pkt in chunk:
-
-            packets_for_throughput.append(pkt)
-
-            if pkt.time - first_pkt.time > resolution_time/1000:
-
-                upload_time_sent_in_sec = core.userplane_active_millis(packets_for_throughput, subscriber_ip, resolution_time, silence_period, min_report_time).get('userplane_upload_active_millis') / 1000
-                upload_bytes_sent_in_kilobit = core.userplane_effective_bytes_count(packets_for_throughput, subscriber_ip).get('userplane_upload_effective_byte_count') * 8 / 1000
-
-                download_time_sent_in_sec = core.userplane_active_millis(packets_for_throughput, subscriber_ip, resolution_time, silence_period, min_report_time).get('userplane_download_active_millis') / 1000
-                download_bytes_sent_in_kilobit = core.userplane_effective_bytes_count(packets_for_throughput, subscriber_ip).get('userplane_download_effective_byte_count') * 8 / 1000
-
-                upload_througputs.add(upload_bytes_sent_in_kilobit/upload_time_sent_in_sec)
-                download_throughputs.add(download_bytes_sent_in_kilobit/download_time_sent_in_sec)
-
-                first_pkt = pkt
-
-        print(int(round(max(upload_througputs))))
-        print(int(round(max(download_throughputs))))
 
 
 main()
