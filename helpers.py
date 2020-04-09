@@ -99,7 +99,9 @@ def is_ip_address(ip):
 #
 def divide_in_chunks(pcap, chunk_duration):
     interval_time = chunk_duration
+    print("pcap load started", datetime.now())
     pkts = rdpcap(pcap)
+    print("pcap loaded", datetime.now())
     pcap_chunks = []
     chunk_counter = 0
     chunk_start_time = pkts[0].time
