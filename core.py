@@ -52,10 +52,36 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
     download_effective_bytes_count = 0
 
     for pkt in chunk:
-        if pkt["IP"].src == subscriber_ip:
-            upload_effective_bytes_count += len(pkt["GTP_U_Header"])
+
+        tunnel_layer = 5
+        count = 0
+
+        if pkt[tunnel_layer].haslayer("TCP"):
+
+            bytes_in_header_word = 32 / 8
+
+            # get total size from ip packet
+            ip_total_len = pkt[tunnel_layer].getlayer("IP").len
+
+            # get len field from ip header
+            ip_header_len = pkt[tunnel_layer].getlayer("IP").ihl * bytes_in_header_word
+
+            # get len field from tcp header
+            tcp_header_len = pkt[tunnel_layer].getlayer("TCP").dataofs * bytes_in_header_word
+
+            # subtract ip and tcp header size from the total packet size
+            count = ip_total_len - ip_header_len - tcp_header_len
+
         else:
-            download_effective_bytes_count += len(pkt["GTP_U_Header"])
+            count = len(pkt["GTP_U_Header"])
+
+        # cast result to int
+        count = int(round(count))
+
+        if pkt["IP"].src == subscriber_ip:
+            upload_effective_bytes_count += count
+        else:
+            download_effective_bytes_count += count
 
     return {'userplane_upload_effective_byte_count': upload_effective_bytes_count,
             'userplane_download_effective_byte_count': download_effective_bytes_count}
