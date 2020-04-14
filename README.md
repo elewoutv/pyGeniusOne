@@ -15,8 +15,10 @@ a probe system directly to detect irregularities in bigdata feed output.
 	    - ammount of transmitted bytes in upload/download direction. Includes all GTP traffic.
 	- ```userplane_[upload|download]_effective_bytes_count```
 	    - ammount of transmitted bytes in upload/download direction. Includes only GTP-U payload.
-	    (only the user data sent through the tunnel). If the data in the tunnel is encapsulated in a second TCP/IP
-	    packet, the TCP and IP headers will be ignored and only the TCP payload will be counted as effective bytes.
+	    (only the user data sent through the tunnel). If the data in the tunnel is encapsulated in a supported protocol
+	    stack, pyGeniousOne will not account the headers of this stack but only the payload (for example: if you run tcp/
+	    ip in the tunnel, only the bytes after the ip and tcp header will be counted as effective bytes)
+	    Supported protocol stacks: TCP/IP, UDP/IP
 	- ```userplane_[upload|download]_active_millis```
 	    - total time during which bytes were being transmitted in upload/download direction.
     - ```userplane_[upload|download]_max_throughput_kbps```
