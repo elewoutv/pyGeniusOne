@@ -1,3 +1,4 @@
+import eff_byte_protocol_stacks
 
 
 # This function calculates the ammount of packets sent in upload/download direction
@@ -58,30 +59,13 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
 
         if pkt[tunnel_layer].haslayer("TCP"):
 
-            bytes_in_header_word = 32 / 8
-
-            # get total size from ip packet
-            ip_total_len = pkt[tunnel_layer].getlayer("IP").len
-
-            # get len field from ip header
-            ip_header_len = pkt[tunnel_layer].getlayer("IP").ihl * bytes_in_header_word
-
-            # get len field from tcp header
-            tcp_header_len = pkt[tunnel_layer].getlayer("TCP").dataofs * bytes_in_header_word
-
-            # subtract ip and tcp header size from the total packet size
-            count = ip_total_len - ip_header_len - tcp_header_len
+            # if tcp/ip is detected in the tunnel, calculate only the tcp/ip payload
+            count = eff_byte_protocol_stacks.tcp_ip(pkt, tunnel_layer)
 
         elif pkt[tunnel_layer].haslayer("UDP"):
 
-            # udp always has a header of 8 bytes
-            udp_header_len = 8
-
-            # get len field from udp header
-            udp_packet_len = pkt[tunnel_layer].getlayer("UDP").len
-
-            # subtract udp header size from the total packet size
-            count = udp_packet_len - udp_header_len
+            # if udp/ip is detected in the tunnel, calculate only the udp/ip payload
+            count = eff_byte_protocol_stacks.udp_ip(pkt, tunnel_layer)
 
         else:
             # if we cannot identify the protocol stack used in the tunnel, we simply calculate the GTP-U payload length
