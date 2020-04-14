@@ -72,7 +72,20 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
             # subtract ip and tcp header size from the total packet size
             count = ip_total_len - ip_header_len - tcp_header_len
 
+        elif pkt[tunnel_layer].haslayer("UDP"):
+
+            # udp always has a header of 8 bytes
+            udp_header_len = 8
+
+            # get len field from udp header
+            udp_packet_len = pkt[tunnel_layer].getlayer("UDP").len
+
+            # subtract udp header size from the total packet size
+            count = udp_packet_len - udp_header_len
+
         else:
+            # if we cannot identify the protocol stack used in the tunnel, we simply calculate the GTP-U payload length
+            # as a whole
             count = len(pkt["GTP_U_Header"])
 
         # cast result to int
