@@ -94,64 +94,50 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
 #
 def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time):
 
-    upload_active_time = 0
-    download_active_time = 0
-
     upload_chunk = []
     download_chunk = []
 
+    # split the chunk in two separate chunks: one with all uploaded packets, one with all downloaded packets
     for pkt in chunk:
         if pkt["IP"].src == subscriber_ip:
             upload_chunk.append(pkt)
         else:
             download_chunk.append(pkt)
 
-    for i in range(0, len(upload_chunk)):
-
-        # if it is the first packet of the chunk, delta time is min report time because the difference between the prev.
-        # packet is infinite and thus greater than the silence period
-        if i == 0:
-            delta_time = min_report_time
-
-        # subtract unix time from previous packet from the unix time of the current packet
-        else:
-            delta_time = (upload_chunk[i].time - upload_chunk[i - 1].time) * resolution_time
-            print(delta_time)
-
-        # if the delta time is greater than the silence period in milliseconds,
-        # count the minimum report time as active time
-        if delta_time > (silence_period * resolution_time):
-            delta_time = min_report_time
-
-        upload_active_time += delta_time
-
-        # only now do we cast from decimal to integer to make the result as accurate as possible
+    upload_active_time = _active_time(upload_chunk, min_report_time, resolution_time, silence_period)
     upload_active_time = int(round(upload_active_time))
 
-    for i in range(0, len(download_chunk)):
-
-        # if it is the first packet of the chunk, delta time is min report time because the difference between the prev.
-        # packet is infinite and thus greater than the silence period
-        if i == 0:
-            delta_time = min_report_time
-
-        # subtract unix time from previous packet from the unix time of the current packet
-        else:
-            delta_time = (download_chunk[i].time - download_chunk[i - 1].time) * resolution_time
-            print(delta_time)
-
-        # if the delta time is greater than the silence period in milliseconds,
-        # count the minimum report time as active time
-        if delta_time > (silence_period * resolution_time):
-            delta_time = min_report_time
-
-        download_active_time += delta_time
-
-        # only now do we cast from decimal to integer to make the result as accurate as possible
+    download_active_time = _active_time(download_chunk, min_report_time, resolution_time, silence_period)
     download_active_time = int(round(download_active_time))
 
     return {'userplane_upload_active_millis': upload_active_time,
             'userplane_download_active_millis': download_active_time}
+
+
+def _active_time(chunk, min_report_time, resolution_time, silence_period):
+    for i in range(0, len(chunk)):
+
+        active_time = 0
+
+        # if it is the first packet of the chunk, delta time is min report time because the difference between the prev.
+        # packet is infinite and thus greater than the silence period
+        if i == 0:
+            delta_time = min_report_time
+
+        # subtract unix time from previous packet from the unix time of the current packet
+        else:
+            delta_time = (chunk[i].time - chunk[i - 1].time) * resolution_time
+            print(delta_time)
+
+        # if the delta time is greater than the silence period in milliseconds,
+        # count the minimum report time as active time
+        if delta_time > (silence_period * resolution_time):
+            delta_time = min_report_time
+
+        active_time += delta_time
+
+        # only now do we cast from decimal to integer to make the result as accurate as possible
+    return active_time
 
 
 # This function calculates the estimated highest throughput reached during a chunk in upload/download direction
