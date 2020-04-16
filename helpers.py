@@ -11,7 +11,9 @@ def check_commandline_params(parser):
 
     # Optional arguments
     parser.add_argument('-f',
-                        help="file to write output to")
+                        help="file to write output to",
+                        dest='file',
+                        default="")
     parser.add_argument('--resolution-time',
                         type=int,
                         default=resolution_time_default,

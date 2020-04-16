@@ -82,8 +82,15 @@ def main():
         if calc_max_throughput:
             data.update(core.userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip))
 
-        print("chunk", chunk_count)
-        print(json.dumps(data))
+        # if the -f option is specified, write to file instead of STDOUT
+        if args.file == "":
+            print("chunk", chunk_count)
+            print(json.dumps(data))
+
+        else:
+            file = open(args.file, "w")
+            file.write("chunk" + " " + str(chunk_count) + "\n")
+            file.write(json.dumps(data))
 
         chunk_count += 1
 
