@@ -27,16 +27,6 @@ def check_commandline_params(parser):
                         default=minimum_report_time_default,
                         dest='min_report_time',
                         help="minimum report time in ms")
-    parser.add_argument('-u', '--up',
-                        help="calculate only upload stats",
-                        default=False,
-                        dest='up',
-                        action="store_true")
-    parser.add_argument('-d', '--down',
-                        help="calculate only download stats",
-                        default=False,
-                        dest='down',
-                        action="store_true")
     # Required arguments
     parser.add_argument('pcap',
                         help="subscriber session pcap file")
@@ -45,35 +35,36 @@ def check_commandline_params(parser):
                                 help="ip adress of the subsciber (the client)",
                                 dest='ip',
                                 required=True)
+
     # Output arguments
-    # output_group = parser.add_argument_group(title="output options",
-    #                                          description="pyGeniousOne will output all available statistics by default,"
-    #                                                      " you can limit the output with these options")
-    # output_group.add_argument('-C', '--count-packets',
-    #                           help="Include packet count in output",
-    #                           default=False,
-    #                           dest='packetCount',
-    #                           action="store_true")
-    # output_group.add_argument('-c', '--count-bytes',
-    #                           help="Include total byte count in output",
-    #                           default=False,
-    #                           dest='bytes',
-    #                           action="store_true")
-    # output_group.add_argument('-e', '--effective-bytes',
-    #                           help="Include GTP-U byte count in output",
-    #                           default=False,
-    #                           dest='effectieBytes',
-    #                           action="store_true")
-    # output_group.add_argument('-a', '--active-millis',
-    #                           help="Include total transmission time in a specific direction in output",
-    #                           default=False,
-    #                           dest='activeMillis',
-    #                           action="store_true")
-    # output_group.add_argument('-t', '--max-throughput',
-    #                           help="Include highest throughput reached in specific direction in output",
-    #                           default=False,
-    #                           dest='maxThroughput',
-    #                           action="store_true")
+    output_group = parser.add_argument_group(title="output options",
+                                             description="pyGeniousOne will output all available statistics by default,"
+                                                         " you can limit the output with these options")
+    output_group.add_argument('-C', '--count-packets',
+                              help="Include packet count in output",
+                              default=False,
+                              dest='packetCount',
+                              action="store_true")
+    output_group.add_argument('-c', '--count-bytes',
+                              help="Include total byte count in output",
+                              default=False,
+                              dest='bytes',
+                              action="store_true")
+    output_group.add_argument('-e', '--effective-bytes',
+                              help="Include GTP-U byte count in output",
+                              default=False,
+                              dest='effectiveBytes',
+                              action="store_true")
+    output_group.add_argument('-a', '--active-millis',
+                              help="Include total transmission time in a specific direction in output",
+                              default=False,
+                              dest='activeMillis',
+                              action="store_true")
+    output_group.add_argument('-t', '--max-throughput',
+                              help="Include highest throughput reached in specific direction in output",
+                              default=False,
+                              dest='maxThroughput',
+                              action="store_true")
 
 
 def file_exists(file):
