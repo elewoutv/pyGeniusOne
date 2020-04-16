@@ -115,9 +115,10 @@ def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_perio
 
 
 def _active_time(chunk, min_report_time, resolution_time, silence_period):
-    for i in range(0, len(chunk)):
 
-        active_time = 0
+    active_time = 0
+
+    for i in range(0, len(chunk)):
 
         # if it is the first packet of the chunk, delta time is min report time because the difference between the prev.
         # packet is infinite and thus greater than the silence period
@@ -127,7 +128,6 @@ def _active_time(chunk, min_report_time, resolution_time, silence_period):
         # subtract unix time from previous packet from the unix time of the current packet
         else:
             delta_time = (chunk[i].time - chunk[i - 1].time) * resolution_time
-            print(delta_time)
 
         # if the delta time is greater than the silence period in milliseconds,
         # count the minimum report time as active time
@@ -158,8 +158,10 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
     # we use a list instead of a set because the pkt type is not hashable >:(
     packets_for_throughput = []
 
-    upload_througputs = set()
-    download_throughputs = set()
+    # initialize the sets with a default value of 0. If the dataset is shorter than the resolution time, there is at
+    # least one value in the set.
+    upload_througputs = set([0])
+    download_throughputs = set([0])
 
     for pkt in chunk:
 

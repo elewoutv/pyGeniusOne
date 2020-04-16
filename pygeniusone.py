@@ -55,7 +55,7 @@ def main():
         data.update(core.userplane_bytes_count(chunk, subscriber_ip))
         data.update(core.userplane_effective_bytes_count(chunk, subscriber_ip))
         data.update(core.userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time))
-        # data.update(core.userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip))
+        data.update(core.userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip))
 
         print("chunk", chunk_count)
         print(json.dumps(data))
