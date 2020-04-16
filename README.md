@@ -73,7 +73,7 @@ pygeniousone [options] filename.pcap
 ### Options
 
 By default pyGeniusOne will output all available statistics with default parameters. You can use these options to limit the output to a subset of
-stats or change the calculation parameters. NOT IMPLEMENTED
+stats or change the calculation parameters. You can also write output to a file.
 
 ```
 -C, --count-packets
@@ -108,14 +108,6 @@ Silence period (see above)
 ```
 Minimum report time (see above)
 ```
--u, --up
-```
-Calculate only upload statistics.
-```
--d, --down
-```
-Calculate only download statistics.
-```
 -i --ip-adress x.x.x.x
 ```
 The address of the subscriber (the client). This is used to determine which packets to count in "upload" and "download"
@@ -124,3 +116,10 @@ direction.
 -f
 ```
 Specify file to write output to.
+
+## Development
+### Effective bytes protocol stacks
+
+You can implement additional methods for other protocol stacks to calculate the effective bytes inside the tunnel. 
+You'll have to add a filter in the eff_byte_protocol_stacks.py file and add an additional branch in the effective bytes 
+function.
