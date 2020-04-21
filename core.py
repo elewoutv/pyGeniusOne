@@ -94,13 +94,28 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
 #
 def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time):
 
+    tunnel_layer = 5
     upload_chunk = []
     download_chunk = []
 
     # split the chunk in two separate chunks: one with all uploaded packets, one with all downloaded packets
     for pkt in chunk:
+
+        # netscout seems to ignore empty UDP and TCP packets
+        # (mostly just ACK's in the case of TCP) so we filter them out
+        if pkt[tunnel_layer].haslayer("TCP"):
+            tcp_payload = eff_byte_protocol_stacks.tcp_ip(pkt, tunnel_layer)
+            if tcp_payload == 0.0:
+                continue
+
+        if pkt[tunnel_layer].haslayer("UDP"):
+            udp_payload = eff_byte_protocol_stacks.udp_ip(pkt, tunnel_layer)
+            if udp_payload == 0.0:
+                continue
+
         if pkt["IP"].src == subscriber_ip:
             upload_chunk.append(pkt)
+
         else:
             download_chunk.append(pkt)
 
@@ -120,13 +135,10 @@ def _active_time(chunk, min_report_time, resolution_time, silence_period):
 
     for i in range(0, len(chunk)):
 
-        # if it is the first packet of the chunk, delta time is min report time because the difference between the prev.
-        # packet is infinite and thus greater than the silence period
         if i == 0:
-            delta_time = min_report_time
-
-        # subtract unix time from previous packet from the unix time of the current packet
+            delta_time = 1
         else:
+            # subtract unix time from previous packet from the unix time of the current packet
             delta_time = (chunk[i].time - chunk[i - 1].time) * resolution_time
 
         # if the delta time is greater than the silence period in milliseconds,

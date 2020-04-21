@@ -65,6 +65,10 @@ for each deltaTime in packets
 
 return activeTime
 ```
+Please not that the active millis function ignores UDP and TCP packets inside the tunnel with an empty payload
+(like naked TCP ACK's).
+
+If the first packet of a trace is considerend, its deltatime is equal to the minimum_report_time.
 
 ## Usage
 ```
@@ -123,3 +127,5 @@ Specify file to write output to.
 You can implement additional methods for other protocol stacks to calculate the effective bytes inside the tunnel. 
 You'll have to add a filter in the eff_byte_protocol_stacks.py file and add an additional branch in the effective bytes 
 function.
+
+These functions are also used as a filter in the active_millis function.
