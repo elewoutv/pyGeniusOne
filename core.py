@@ -1,3 +1,5 @@
+import math
+
 import eff_byte_protocol_stacks
 
 
@@ -163,8 +165,6 @@ def _active_time(chunk, min_report_time, resolution_time, silence_period):
 def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip):
 
     millseconds_in_second = 1000
-    bits_in_byte = 8
-
     first_pkt = chunk[0]
 
     # we use a list instead of a set because the pkt type is not hashable >:(
@@ -175,44 +175,52 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
     upload_througputs = set([0])
     download_throughputs = set([0])
 
-    for pkt in chunk:
+    for i in range(0, len(chunk) - 1):
 
+        pkt = chunk[i]
         packets_for_throughput.append(pkt)
 
         # we calculate the througput roughly every time the resolution_time has passed
-        if pkt.time - first_pkt.time > resolution_time / millseconds_in_second:
+        if pkt.time - first_pkt.time > resolution_time / millseconds_in_second or i == len(chunk) - 1:
 
-            # get the upload time and convert it to seconds
-            upload_time_sent_in_sec = userplane_active_millis(packets_for_throughput,
+            # get the upload time
+            upload_time_sent = userplane_active_millis(packets_for_throughput,
                                                               subscriber_ip,
                                                               resolution_time,
                                                               silence_period,
                                                               min_report_time).get(
-                'userplane_upload_active_millis') / millseconds_in_second
+                'userplane_upload_active_millis')
 
-            # get the effective bytes and convert it to Kb
-            upload_bytes_sent_in_kilobit = userplane_effective_bytes_count(packets_for_throughput,
+            # get the effective bytes
+            upload_bytes_sent = userplane_effective_bytes_count(packets_for_throughput,
                                                                            subscriber_ip).get(
-                'userplane_upload_effective_byte_count') * bits_in_byte / millseconds_in_second
+                'userplane_upload_effective_byte_count')
 
             # same as above
-            download_time_sent_in_sec = userplane_active_millis(packets_for_throughput,
+            download_time_sent = userplane_active_millis(packets_for_throughput,
                                                                 subscriber_ip,
                                                                 resolution_time,
                                                                 silence_period,
                                                                 min_report_time).get(
-                'userplane_download_active_millis') / millseconds_in_second
+                'userplane_download_active_millis')
 
             # same as above
-            download_bytes_sent_in_kilobit = userplane_effective_bytes_count(packets_for_throughput,
-                                                                             subscriber_ip).get(
-                'userplane_download_effective_byte_count') * bits_in_byte / millseconds_in_second
+            download_bytes_sent = userplane_effective_bytes_count(packets_for_throughput, subscriber_ip).get(
+                'userplane_download_effective_byte_count')
 
             # calculate result in kpbs
-            upload_througputs.add(upload_bytes_sent_in_kilobit / upload_time_sent_in_sec)
-            download_throughputs.add(download_bytes_sent_in_kilobit / download_time_sent_in_sec)
+            if upload_time_sent != 0:
+                upload_througputs.add(upload_bytes_sent / upload_time_sent / 125)
+            else:
+                upload_througputs.add(0)
 
-            first_pkt = pkt
+            if download_time_sent != 0:
+                download_throughputs.add(download_bytes_sent / download_time_sent / 125)
+            else:
+                download_throughputs.add(0)
 
-    return {'userplane_upload_max_throughput_kbps': int(round(max(upload_througputs))),
-            'userplane_download_max_throughput_kbps': int(round(max(download_throughputs)))}
+            first_pkt = chunk[i + 1]
+            packets_for_throughput = []
+
+    return {'userplane_upload_max_throughput_kbps': math.ceil(max(upload_througputs)),
+            'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
