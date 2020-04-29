@@ -67,6 +67,11 @@ def check_commandline_params(parser):
                               default=False,
                               dest='maxThroughput',
                               action="store_true")
+    output_group.add_argument('-T', '--ttfb',
+                              help="Include the time difference between the first syn packet and first data packet",
+                              default=False,
+                              dest='ttfb',
+                              action="store_true")
 
 
 def file_exists(file):

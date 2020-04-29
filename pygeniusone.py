@@ -47,13 +47,14 @@ def main():
     chunk_count = 0
 
     # this is very ugly. I'm so sorry
-    if not args.packetCount and not args.bytes and not args.effectiveBytes and not args.activeMillis and not args.maxThroughput:
+    if not args.packetCount and not args.bytes and not args.effectiveBytes and not args.activeMillis and not args.maxThroughput and not args.ttfb:
 
         calc_packet_count = True
         calc_bytes_count = True
         calc_eff_bytes_count = True
         calc_active_millis = True
         calc_max_throughput = True
+        calc_ttfb = True
 
     else:
         calc_packet_count = args.packetCount
@@ -61,6 +62,7 @@ def main():
         calc_eff_bytes_count = args.effectiveBytes
         calc_active_millis = args.activeMillis
         calc_max_throughput = args.maxThroughput
+        calc_ttfb = args.ttfb
 
     for chunk in pcap_chunks:
 
@@ -82,7 +84,8 @@ def main():
         if calc_max_throughput:
             data.update(core.userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip))
 
-        data.update(core.ttfb_usec(chunk))
+        if calc_ttfb:
+            data.update(core.ttfb_usec(chunk))
 
         # if the -f option is specified, write to file instead of STDOUT
         if args.file == "":
