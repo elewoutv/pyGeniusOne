@@ -228,12 +228,15 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
 
 def ttfb_usec(chunk):
 
+    # tunnel layer
+    tunnel_layer = 5
+
     # find the first tcp syn packet in the chunk
     first_syn_packet = None
 
     for pkt in chunk:
-        if pkt[5].haslayer('TCP'):
-            if pkt[5].getlayer('TCP').flags == "S":
+        if pkt[tunnel_layer].haslayer('TCP'):
+            if pkt[tunnel_layer].getlayer('TCP').flags == "S":
                 first_syn_packet = pkt
                 break
 
@@ -241,7 +244,7 @@ def ttfb_usec(chunk):
     first_data_packet = None
 
     for pkt in chunk:
-        if pkt[5].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(pkt, 5) > 0:
+        if pkt[tunnel_layer].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(pkt, tunnel_layer) > 0:
             first_data_packet = pkt
             break
 
