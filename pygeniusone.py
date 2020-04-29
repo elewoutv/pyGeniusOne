@@ -11,8 +11,6 @@ import core
 from scapy.all import *
 from scapy.contrib.gtp import *
 
-from eff_byte_protocol_stacks import tcp_ip
-
 
 def main():
 
@@ -84,6 +82,8 @@ def main():
         if calc_max_throughput:
             data.update(core.userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip))
 
+        data.update(core.ttfb_usec(chunk))
+
         # if the -f option is specified, write to file instead of STDOUT
         if args.file == "":
             print("chunk", chunk_count)
@@ -96,26 +96,6 @@ def main():
 
         chunk_count += 1
 
-        first_syn_packet = None
-        for pkt in chunk:
-            if pkt[5].haslayer('TCP'):
-                if pkt[5].getlayer('TCP').flags == "S":
-                    first_syn_packet = pkt
-                    break
-
-        first_data_packet = None
-        for pkt in chunk:
-            if pkt[5].haslayer('TCP') and tcp_ip(pkt, 5) > 0:
-                first_data_packet = pkt
-                break
-
-        first_syn_packet_time = 0
-        first_data_packet_time = 0
-        if first_syn_packet is not None and first_data_packet is not None:
-            first_syn_packet_time = first_syn_packet.time
-            first_data_packet_time = first_data_packet.time
-
-        print(first_data_packet_time - first_syn_packet_time)
 
 main()
 

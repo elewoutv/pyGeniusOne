@@ -224,3 +224,34 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
 
     return {'userplane_upload_max_throughput_kbps': math.ceil(max(upload_througputs)),
             'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
+
+
+def ttfb_usec(chunk):
+
+    # find the first tcp syn packet in the chunk
+    first_syn_packet = None
+
+    for pkt in chunk:
+        if pkt[5].haslayer('TCP'):
+            if pkt[5].getlayer('TCP').flags == "S":
+                first_syn_packet = pkt
+                break
+
+    # find the first data packet in the chunk
+    first_data_packet = None
+
+    for pkt in chunk:
+        if pkt[5].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(pkt, 5) > 0:
+            first_data_packet = pkt
+            break
+
+    # if a syn packet AND a data packet are found, calculate the time difference
+    first_syn_packet_time = 0
+    first_data_packet_time = 0
+
+    if first_syn_packet is not None and first_data_packet is not None:
+        first_syn_packet_time = first_syn_packet.time
+        first_data_packet_time = first_data_packet.time
+
+    result = first_data_packet_time - first_syn_packet_time
+    return {'userplane_ttfb_usec': result}
