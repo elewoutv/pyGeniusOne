@@ -231,6 +231,8 @@ def ttfb_usec(chunk):
     # tunnel layer
     tunnel_layer = 5
 
+    milliseconds_in_second = 1000
+
     # find the first tcp syn packet in the chunk
     first_syn_packet = None
 
@@ -256,5 +258,5 @@ def ttfb_usec(chunk):
         first_syn_packet_time = first_syn_packet.time
         first_data_packet_time = first_data_packet.time
 
-    result = first_data_packet_time - first_syn_packet_time
+    result = (first_data_packet_time - first_syn_packet_time) * milliseconds_in_second
     return {'userplane_ttfb_usec': result}
