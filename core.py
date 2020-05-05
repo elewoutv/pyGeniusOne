@@ -226,6 +226,7 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
             'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
 
 
+# wyd with missing syn packet?
 def ttfb_usec(chunk):
 
     # tunnel layer
@@ -258,5 +259,5 @@ def ttfb_usec(chunk):
         first_syn_packet_time = first_syn_packet.time
         first_data_packet_time = first_data_packet.time
 
-    result = (first_data_packet_time - first_syn_packet_time) * milliseconds_in_second
+    result = int((first_data_packet_time - first_syn_packet_time) * milliseconds_in_second)
     return {'userplane_ttfb_usec': result}
