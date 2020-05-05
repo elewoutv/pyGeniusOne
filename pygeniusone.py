@@ -11,6 +11,8 @@ import core
 from scapy.all import *
 from scapy.contrib.gtp import *
 
+from eff_byte_protocol_stacks import tcp_ip
+
 
 def main():
 
@@ -86,6 +88,17 @@ def main():
 
         if calc_ttfb:
             data.update(core.ttfb_usec(chunk))
+
+        sequence_numbers = set()
+        retransmitted_count = 0
+        for i in range(0, len(chunk)):
+            if chunk[i][5].haslayer('TCP') and tcp_ip(chunk[i], 5) != 0:
+                if chunk[i][5].getlayer('TCP').seq in sequence_numbers:
+                    retransmitted_count += 1
+                else:
+                    sequence_numbers.add(chunk[i][5].getlayer('TCP').seq)
+
+        print(retransmitted_count)
 
         # if the -f option is specified, write to file instead of STDOUT
         if args.file == "":
