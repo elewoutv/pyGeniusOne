@@ -260,4 +260,8 @@ def ttfb_usec(chunk):
         first_data_packet_time = first_data_packet.time
 
     result = int((first_data_packet_time - first_syn_packet_time) * milliseconds_in_second)
+
+    if result < 0:
+        result = 0
+
     return {'userplane_ttfb_usec': result}
