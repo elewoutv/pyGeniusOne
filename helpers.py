@@ -72,6 +72,11 @@ def check_commandline_params(parser):
                               default=False,
                               dest='ttfb',
                               action="store_true")
+    output_group.add_argument('-r', '--retransmitted-packets',
+                              help="Include the ammount of tcp retransmissions",
+                              default=False,
+                              dest='retransmitted_packets',
+                              action="store_true")
 
 
 def file_exists(file):

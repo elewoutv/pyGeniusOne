@@ -265,3 +265,26 @@ def ttfb_usec(chunk):
         result = 0
 
     return {'userplane_ttfb_usec': result}
+
+
+def retransmitted_packets_count(chunk, subscriber_ip):
+    sequence_numbers = set()
+    retransmitted_up_count = 0
+    retransmitted_down_count = 0
+
+    for i in range(0, len(chunk)):
+        if chunk[i][5].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(chunk[i], 5) != 0:
+            if chunk[i][5].getlayer('TCP').seq in sequence_numbers:
+                if chunk[i][5]["IP"].src == subscriber_ip:
+
+                    retransmitted_up_count += 1
+
+                else:
+
+                    retransmitted_down_count += 1
+
+            else:
+                sequence_numbers.add(chunk[i][5].getlayer('TCP').seq)
+
+    return {'userplane_upload_retransmitted_packets': retransmitted_up_count,
+            'userplane_download_retransmitted_packets': retransmitted_down_count}

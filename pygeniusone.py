@@ -49,7 +49,7 @@ def main():
     chunk_count = 0
 
     # this is very ugly. I'm so sorry
-    if not args.packetCount and not args.bytes and not args.effectiveBytes and not args.activeMillis and not args.maxThroughput and not args.ttfb:
+    if not args.packetCount and not args.bytes and not args.effectiveBytes and not args.activeMillis and not args.maxThroughput and not args.ttfb and not args.retransmitted_packets:
 
         calc_packet_count = True
         calc_bytes_count = True
@@ -57,6 +57,7 @@ def main():
         calc_active_millis = True
         calc_max_throughput = True
         calc_ttfb = True
+        calc_retransmitted_packets = True
 
     else:
         calc_packet_count = args.packetCount
@@ -65,6 +66,7 @@ def main():
         calc_active_millis = args.activeMillis
         calc_max_throughput = args.maxThroughput
         calc_ttfb = args.ttfb
+        calc_retransmitted_packets = args.retransmitted_packets
 
     for chunk in pcap_chunks:
 
@@ -89,16 +91,8 @@ def main():
         if calc_ttfb:
             data.update(core.ttfb_usec(chunk))
 
-        sequence_numbers = set()
-        retransmitted_count = 0
-        for i in range(0, len(chunk)):
-            if chunk[i][5].haslayer('TCP') and tcp_ip(chunk[i], 5) != 0:
-                if chunk[i][5].getlayer('TCP').seq in sequence_numbers:
-                    retransmitted_count += 1
-                else:
-                    sequence_numbers.add(chunk[i][5].getlayer('TCP').seq)
-
-        print(retransmitted_count)
+        if calc_retransmitted_packets:
+            data.update(core.retransmitted_packets_count(chunk, subscriber_ip))
 
         # if the -f option is specified, write to file instead of STDOUT
         if args.file == "":
