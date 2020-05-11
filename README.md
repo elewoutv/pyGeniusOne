@@ -23,6 +23,11 @@ a probe system directly to detect irregularities in bigdata feed output.
 	    - total time during which bytes were being transmitted in upload/download direction.
     - ```userplane_[upload|download]_max_throughput_kbps```
         - highest throughput reached during the interval in upload/download direction.
+    - ```userplane_[upload|download]_retransmitted_packets_count```
+        - ammount of tcp retransmissions during the interval in upload/download direction.
+    - ```userplane_ttfb_usec```
+        - time difference in milliseconds between the first tcp syn of a connection and the first data packet.
+        
     
 ### Underlying calculations
 #### Additional definitions
@@ -100,6 +105,14 @@ Include userplane_[upload|download]_active_millis in output.
 ```
 Include userplane_[upload|download]_max_throughput in output.
 ```
+-r, --retransmitted-packets
+```
+Include userplane_[upload|download]_retransmitted_packets_count in output.
+```
+-T, --ttfb
+```
+Include userplane_ttfb_usec in output.
+```
 --resolution-time
 ```
 Resolution time (see above)
@@ -127,5 +140,3 @@ Specify file to write output to.
 You can implement additional methods for other protocol stacks to calculate the effective bytes inside the tunnel. 
 You'll have to add a filter in the eff_byte_protocol_stacks.py file and add an additional branch in the effective bytes 
 function.
-
-These functions are also used as a filter in the active_millis function.
