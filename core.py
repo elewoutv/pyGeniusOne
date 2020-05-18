@@ -8,7 +8,7 @@ import eff_byte_protocol_stacks
 # @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_packets_count(chunk, subscriber_ip):
+def userplane_packets_count(chunk, subscriber_ip, direction):
 
     # amount of packets in upload/download direction in the session
     upload_count = 0
@@ -20,7 +20,14 @@ def userplane_packets_count(chunk, subscriber_ip):
         else:
             download_count += 1
 
-    return {'userplane_upload_packets_count': upload_count, 'userplane_download_packets_count': download_count}
+    if direction == "up":
+        return {'userplane_upload_packets_count': upload_count}
+
+    elif direction == "down":
+        return {'userplane_download_packets_count': download_count}
+
+    else:
+        return {'userplane_upload_packets_count': upload_count, 'userplane_download_packets_count': download_count}
 
 
 # This function calculates the ammount of bytes sent in upload/download direction
@@ -28,7 +35,7 @@ def userplane_packets_count(chunk, subscriber_ip):
 # @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_bytes_count(chunk, subscriber_ip):
+def userplane_bytes_count(chunk, subscriber_ip, direction):
 
     # bytecount in upload/download direction during the session
     upload_byte_count = 0
@@ -40,7 +47,14 @@ def userplane_bytes_count(chunk, subscriber_ip):
         else:
             download_byte_count += len(pkt)
 
-    return {'userplane_upload_byte_count': upload_byte_count, 'userplane_download_byte_count': download_byte_count}
+    if direction == "up":
+        return {'userplane_upload_byte_count': upload_byte_count}
+
+    elif direction == "down":
+        return {'userplane_download_byte_count': download_byte_count}
+
+    else:
+        return {'userplane_upload_byte_count': upload_byte_count, 'userplane_download_byte_count': download_byte_count}
 
 
 # This function calculates the effective bytes (the GTP-U payload) sent in upload/download direction
@@ -48,7 +62,7 @@ def userplane_bytes_count(chunk, subscriber_ip):
 # @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_effective_bytes_count(chunk, subscriber_ip):
+def userplane_effective_bytes_count(chunk, subscriber_ip, direction):
 
     # effective bytecount in upload/download direction during the session
     upload_effective_bytes_count = 0
@@ -82,8 +96,15 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
         else:
             download_effective_bytes_count += count
 
-    return {'userplane_upload_effective_byte_count': upload_effective_bytes_count,
-            'userplane_download_effective_byte_count': download_effective_bytes_count}
+        if direction == "up":
+            return {'userplane_upload_effective_byte_count': upload_effective_bytes_count}
+
+        elif direction == "down":
+            return {'userplane_download_effective_byte_count': download_effective_bytes_count}
+
+        else:
+            return {'userplane_upload_effective_byte_count': upload_effective_bytes_count,
+                    'userplane_download_effective_byte_count': download_effective_bytes_count}
 
 
 # This function calculates the estimated time during which data was sent in upload/download direction
@@ -94,7 +115,7 @@ def userplane_effective_bytes_count(chunk, subscriber_ip):
 # @param min_report_time Time that will be counted as active time when silence_period is exceeded
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time):
+def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time, direction):
 
     tunnel_layer = 5
     upload_chunk = []
@@ -127,8 +148,15 @@ def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_perio
     download_active_time = _active_time(download_chunk, min_report_time, resolution_time, silence_period)
     download_active_time = int(round(download_active_time))
 
-    return {'userplane_upload_active_millis': upload_active_time,
-            'userplane_download_active_millis': download_active_time}
+    if direction == "up":
+        return {'userplane_upload_active_millis': upload_active_time}
+
+    elif direction == "down":
+        return {'userplane_download_active_millis': download_active_time}
+
+    else:
+        return {'userplane_upload_active_millis': upload_active_time,
+                'userplane_download_active_millis': download_active_time}
 
 
 def _active_time(chunk, min_report_time, resolution_time, silence_period):
@@ -162,7 +190,7 @@ def _active_time(chunk, min_report_time, resolution_time, silence_period):
 # @param min_report_time Time that will be counted as active time when silence_period is exceeded
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip):
+def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip, direction):
 
     millseconds_in_second = 1000
     first_pkt = chunk[0]
@@ -222,8 +250,15 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
             first_pkt = chunk[i + 1]
             packets_for_throughput = []
 
-    return {'userplane_upload_max_throughput_kbps': math.ceil(max(upload_througputs)),
-            'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
+    if direction == "up":
+        return {'userplane_upload_max_throughput_kbps': math.ceil(max(upload_througputs))}
+
+    elif direction == "down":
+        return {'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
+
+    else:
+        return {'userplane_upload_max_throughput_kbps': math.ceil(max(upload_througputs)),
+                'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
 
 
 # wyd with missing syn packet?
@@ -267,7 +302,7 @@ def ttfb_usec(chunk):
     return {'userplane_ttfb_usec': result}
 
 
-def retransmitted_packets_count(chunk, subscriber_ip):
+def retransmitted_packets_count(chunk, subscriber_ip, direction):
     sequence_numbers = set()
     retransmitted_up_count = 0
     retransmitted_down_count = 0
@@ -286,5 +321,12 @@ def retransmitted_packets_count(chunk, subscriber_ip):
             else:
                 sequence_numbers.add(chunk[i][5].getlayer('TCP').seq)
 
-    return {'userplane_upload_retransmitted_packets': retransmitted_up_count,
-            'userplane_download_retransmitted_packets': retransmitted_down_count}
+    if direction == "up":
+        return {'userplane_upload_retransmitted_packets': retransmitted_up_count}
+
+    elif direction == "down":
+        return {'userplane_download_retransmitted_packets': retransmitted_down_count}
+
+    else:
+        return {'userplane_upload_retransmitted_packets': retransmitted_up_count,
+                'userplane_download_retransmitted_packets': retransmitted_down_count}

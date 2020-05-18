@@ -77,6 +77,10 @@ def check_commandline_params(parser):
                               default=False,
                               dest='retransmitted_packets',
                               action="store_true")
+    output_group.add_argument('-d', '--direction',
+                              help="Specify the direction (up, down, both) of the stats that will be included in output",
+                              default="both",
+                              dest='direction',)
 
 
 def file_exists(file):
