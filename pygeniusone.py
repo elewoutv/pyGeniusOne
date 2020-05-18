@@ -100,7 +100,7 @@ def main():
         # if the -f option is specified, write to file instead of STDOUT
         if args.file == "":
             print("chunk", chunk_count)
-            print(json.dumps(data))
+            print(json.dumps(data, indent=2))
 
         else:
             file = open(args.file, "w")
