@@ -35,6 +35,7 @@ def check_commandline_params(parser):
     required_group = parser.add_argument_group(title="required arguments")
     required_group.add_argument('-i', '--ip-adress',
                                 help="ip adress of the subsciber (the client)",
+                                nargs='+',
                                 dest='ip',
                                 required=True)
 

@@ -31,10 +31,11 @@ def main():
     resolution_time = args.resolution_time
 
     # Get subscriber ip
-    if helpers.is_ip_address(args.ip):
-        subscriber_ip = args.ip
-    else:
-        sys.exit("ERROR: invalid ip address")
+    for ip in args.ip:
+        if helpers.is_ip_address(ip):
+            subscriber_ip = args.ip
+        else:
+            sys.exit("ERROR: invalid ip address")
 
     # Get capture file location
     if helpers.file_exists(args.pcap):

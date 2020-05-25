@@ -8,14 +8,14 @@ import eff_byte_protocol_stacks
 # @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_packets_count(chunk, subscriber_ip, direction):
+def userplane_packets_count(chunk, subscriber_ips, direction):
 
     # amount of packets in upload/download direction in the session
     upload_count = 0
     download_count = 0
 
     for pkt in chunk:
-        if pkt["IP"].src == subscriber_ip:
+        if pkt["IP"].src in subscriber_ips:
             upload_count += 1
         else:
             download_count += 1
@@ -35,14 +35,14 @@ def userplane_packets_count(chunk, subscriber_ip, direction):
 # @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_bytes_count(chunk, subscriber_ip, direction):
+def userplane_bytes_count(chunk, subscriber_ips, direction):
 
     # bytecount in upload/download direction during the session
     upload_byte_count = 0
     download_byte_count = 0
 
     for pkt in chunk:
-        if pkt["IP"].src == subscriber_ip:
+        if pkt["IP"].src in subscriber_ips:
             upload_byte_count += len(pkt)
         else:
             download_byte_count += len(pkt)
@@ -62,7 +62,7 @@ def userplane_bytes_count(chunk, subscriber_ip, direction):
 # @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_effective_bytes_count(chunk, subscriber_ip, direction):
+def userplane_effective_bytes_count(chunk, subscriber_ips, direction):
 
     # effective bytecount in upload/download direction during the session
     upload_effective_bytes_count = 0
@@ -91,7 +91,7 @@ def userplane_effective_bytes_count(chunk, subscriber_ip, direction):
         # cast result to int
         count = int(round(count))
 
-        if pkt["IP"].src == subscriber_ip:
+        if pkt["IP"].src in subscriber_ips:
             upload_effective_bytes_count += count
         else:
             download_effective_bytes_count += count
@@ -115,7 +115,7 @@ def userplane_effective_bytes_count(chunk, subscriber_ip, direction):
 # @param min_report_time Time that will be counted as active time when silence_period is exceeded
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_period, min_report_time, direction):
+def userplane_active_millis(chunk, subscriber_ips, resolution_time, silence_period, min_report_time, direction):
 
     tunnel_layer = 5
     upload_chunk = []
@@ -136,7 +136,7 @@ def userplane_active_millis(chunk, subscriber_ip, resolution_time, silence_perio
             if udp_payload == 0.0:
                 continue
 
-        if pkt["IP"].src == subscriber_ip:
+        if pkt["IP"].src in subscriber_ips:
             upload_chunk.append(pkt)
 
         else:
@@ -190,7 +190,7 @@ def _active_time(chunk, min_report_time, resolution_time, silence_period):
 # @param min_report_time Time that will be counted as active time when silence_period is exceeded
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
-def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ip, direction):
+def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ips, direction):
 
     millseconds_in_second = 1000
     first_pkt = chunk[0]
@@ -213,7 +213,7 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
 
             # get the upload time
             upload_time_sent = userplane_active_millis(packets_for_throughput,
-                                                              subscriber_ip,
+                                                              subscriber_ips,
                                                               resolution_time,
                                                               silence_period,
                                                               min_report_time).get(
@@ -221,19 +221,19 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
 
             # get the effective bytes
             upload_bytes_sent = userplane_effective_bytes_count(packets_for_throughput,
-                                                                           subscriber_ip).get(
+                                                                           subscriber_ips).get(
                 'userplane_upload_effective_byte_count')
 
             # same as above
             download_time_sent = userplane_active_millis(packets_for_throughput,
-                                                                subscriber_ip,
+                                                                subscriber_ips,
                                                                 resolution_time,
                                                                 silence_period,
                                                                 min_report_time).get(
                 'userplane_download_active_millis')
 
             # same as above
-            download_bytes_sent = userplane_effective_bytes_count(packets_for_throughput, subscriber_ip).get(
+            download_bytes_sent = userplane_effective_bytes_count(packets_for_throughput, subscriber_ips).get(
                 'userplane_download_effective_byte_count')
 
             # calculate result in kpbs
@@ -302,7 +302,7 @@ def ttfb_usec(chunk):
     return {'userplane_ttfb_usec': result}
 
 
-def retransmitted_packets_count(chunk, subscriber_ip, direction):
+def retransmitted_packets_count(chunk, subscriber_ips, direction):
     sequence_numbers = set()
     retransmitted_up_count = 0
     retransmitted_down_count = 0
@@ -310,7 +310,7 @@ def retransmitted_packets_count(chunk, subscriber_ip, direction):
     for i in range(0, len(chunk)):
         if chunk[i][5].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(chunk[i], 5) != 0:
             if chunk[i][5].getlayer('TCP').seq in sequence_numbers:
-                if chunk[i][5]["IP"].src == subscriber_ip:
+                if chunk[i][5]["IP"].src in subscriber_ips:
 
                     retransmitted_up_count += 1
 
