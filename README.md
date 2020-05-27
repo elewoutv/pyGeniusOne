@@ -10,13 +10,13 @@ a probe system directly to detect irregularities in bigdata feed output.
 ### nGeniusOne available statistics
 - **available**
 	- ```userplane_[upload|download]_packets_count```
-	    - ammount of transmitted packets in upload/download direction.
+	    - amount of transmitted packets in upload/download direction.
 	- ```userplane_[upload|download]_bytes_count```
-	    - ammount of transmitted bytes in upload/download direction. Includes all GTP traffic.
+	    - amount of transmitted bytes in upload/download direction. Includes all GTP traffic.
 	- ```userplane_[upload|download]_effective_bytes_count```
-	    - ammount of transmitted bytes in upload/download direction. Includes only GTP-U payload.
+	    - amount of transmitted bytes in upload/download direction. Includes only GTP-U payload.
 	    (only the user data sent through the tunnel). If the data in the tunnel is encapsulated in a supported protocol
-	    stack, pyGeniousOne will not account the headers of this stack but only the payload (for example: if you run tcp/
+	    stack, pyGeniusOne will not account the headers of this stack but only the payload (for example: if you run tcp/
 	    ip in the tunnel, only the bytes after the ip and tcp header will be counted as effective bytes)
 	    Supported protocol stacks: TCP/IP, UDP/IP
 	- ```userplane_[upload|download]_active_millis```
@@ -24,7 +24,7 @@ a probe system directly to detect irregularities in bigdata feed output.
     - ```userplane_[upload|download]_max_throughput_kbps```
         - highest throughput reached during the interval in upload/download direction.
     - ```userplane_[upload|download]_retransmitted_packets_count```
-        - ammount of tcp retransmissions during the interval in upload/download direction.
+        - amount of tcp retransmissions during the interval in upload/download direction.
     - ```userplane_ttfb_usec```
         - time difference in milliseconds between the first tcp syn of a connection and the first data packet.
         
@@ -34,7 +34,7 @@ a probe system directly to detect irregularities in bigdata feed output.
 - **Delta time**
     - The time between two packets in the trace.
 - **Silence period**
-    - Treshold to determine which data to report as active time. If the delta between two packets
+    - Threshold to determine which data to report as active time. If the delta between two packets
     exceeds 4 seconds, this will be interpreted as silence; instead of counting the full delta as active time, nGeniousOne
     will report only one millisecond.
 - **Minimum report time**
@@ -42,7 +42,7 @@ a probe system directly to detect irregularities in bigdata feed output.
 - **Resolution time**
     - The time unit that will be used to express the active time. The resolution time defaults to 1 second.
 - **Throughput**
-    - Throughput is calculated everytime the total active time exceeds the resolution time (1 second).
+    - Throughput is calculated every time the total active time exceeds the resolution time (1 second).
 
 #### Algorithms
 
@@ -70,69 +70,21 @@ for each deltaTime in packets
 
 return activeTime
 ```
-Please not that the active millis function ignores UDP and TCP packets inside the tunnel with an empty payload
+Please note that the active millis function ignores UDP and TCP packets inside the tunnel with an empty payload
 (like naked TCP ACK's).
 
-If the first packet of a trace is considerend, its deltatime is equal to the minimum_report_time.
+If the first packet of a trace is considered, its deltatime is equal to the minimum_report_time.
 
 ## Usage
 ```
-pygeniousone [options] filename.pcap
+pygeniusone [options] filename.pcap
 ```
 ### Options
 
-By default pyGeniusOne will output all available statistics with default parameters. You can use these options to limit the output to a subset of
-stats or change the calculation parameters. You can also write output to a file.
-
+To list all options and a description of what they do use:
 ```
--C, --count-packets
+pygeniusone -h
 ```
-Include userplane_[upload|download]_packets_count in output.
-```
--c, --count-bytes
-```
-Include userplane_[upload|download]_bytes_count in output.
-```
--e, --effective-bytes
-```
-Include userplane_[upload|download]_effective_bytes_count in output.
-```
--a, --active-millis
-```
-Include userplane_[upload|download]_active_millis in output.
-```
--t, --max-throughput
-```
-Include userplane_[upload|download]_max_throughput in output.
-```
--r, --retransmitted-packets
-```
-Include userplane_[upload|download]_retransmitted_packets_count in output.
-```
--T, --ttfb
-```
-Include userplane_ttfb_usec in output.
-```
---resolution-time
-```
-Resolution time (see above)
-```
---silence-period
-```
-Silence period (see above)
-```
---minimum-report-time
-```
-Minimum report time (see above)
-```
--i --ip-adress x.x.x.x
-```
-The address of the subscriber (the client). This is used to determine which packets to count in "upload" and "download"
-direction.
-```
--f
-```
-Specify file to write output to.
 
 ## Development
 ### Effective bytes protocol stacks
