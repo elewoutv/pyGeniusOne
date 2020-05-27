@@ -9,8 +9,8 @@ import argparse
 import helpers
 import core
 from scapy.all import *
+import portfilters
 from scapy.contrib.gtp import *
-
 from eff_byte_protocol_stacks import tcp_ip
 
 
@@ -46,8 +46,18 @@ def main():
     # Get direction
     direction = args.direction
 
+    # Get port filters
+    tcp_port = args.tcp_port
+    udp_port = args.udp_port
+
     # The netscout calculations expect chunks of 5 minutes so we subdivide the pcap in chunks of 5 minutes
     pcap_chunks = helpers.divide_in_chunks(pcap, 300.00)
+
+    if tcp_port != 0:
+        portfilters.filter_tcp(pcap_chunks, tcp_port)
+
+    if udp_port != 0:
+        portfilters.filter_udp(pcap_chunks, udp_port)
 
     # we need this to print the chunk number between the JSON's
     chunk_count = 0

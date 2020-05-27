@@ -29,6 +29,17 @@ def check_commandline_params(parser):
                         default=minimum_report_time_default,
                         dest='min_report_time',
                         help="minimum report time in ms")
+    parser.add_argument('--tcp',
+                        type=int,
+                        default=0,
+                        dest='tcp_port',
+                        help="only run calculations for packets in tunnel with this TCP source/destination port")
+    parser.add_argument('--udp',
+                        type=int,
+                        default=0,
+                        dest='udp_port',
+                        help="only run calculations for packets in tunnel with this UDP source/destination port")
+
     # Required arguments
     parser.add_argument('pcap',
                         help="subscriber session pcap file")
