@@ -86,6 +86,9 @@ To list all options and a description of what they do use:
 pygeniusone -h
 ```
 
+### Dependencies
+Scapy is required for this program to function. Install it with pip.
+
 ## Development
 ### Effective bytes protocol stacks
 
