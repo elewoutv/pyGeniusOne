@@ -3,9 +3,10 @@ import math
 import eff_byte_protocol_stacks
 
 
-# This function calculates the ammount of packets sent in upload/download direction
+# This function calculates the amount of packets sent in upload/download direction
 # @param chunk A list of packets from the desired time frame to perform calculations on.
-# @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param subscriber_ips the IP's of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param direction can be "up", "down" or "both". This determines what part of the calculation will be returned
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
 def userplane_packets_count(chunk, subscriber_ips, direction):
@@ -30,9 +31,10 @@ def userplane_packets_count(chunk, subscriber_ips, direction):
         return {'userplane_upload_packets_count': upload_count, 'userplane_download_packets_count': download_count}
 
 
-# This function calculates the ammount of bytes sent in upload/download direction
+# This function calculates the amount of bytes sent in upload/download direction
 # @param chunk A list of packets from the desired time frame to perform calculations on.
-# @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param subscriber_ip's The IP's of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param direction can be "up", "down" or "both". This determines what part of the calculation will be returned
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
 def userplane_bytes_count(chunk, subscriber_ips, direction):
@@ -57,9 +59,10 @@ def userplane_bytes_count(chunk, subscriber_ips, direction):
         return {'userplane_upload_byte_count': upload_byte_count, 'userplane_download_byte_count': download_byte_count}
 
 
-# This function calculates the effective bytes (the GTP-U payload) sent in upload/download direction
+# This function calculates the effective bytes (the TCP or UDP payload) sent in upload/download direction
 # @param chunk A list of packets from the desired time frame to perform calculations on.
-# @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param subscriber_ips The IP's of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param direction can be "up", "down" or "both". This determines what part of the calculation will be returned
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
 def userplane_effective_bytes_count(chunk, subscriber_ips, direction):
@@ -109,10 +112,11 @@ def userplane_effective_bytes_count(chunk, subscriber_ips, direction):
 
 # This function calculates the estimated time during which data was sent in upload/download direction
 # @param chunk A list of packets from the desired time frame to perform calculations on.
-# @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param subscriber_ips The IP's of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @param resolution_time The time unit to express the active_time parameter
 # @param silence_period Treshold to determine which delta's to report as active time
 # @param min_report_time Time that will be counted as active time when silence_period is exceeded
+# @param direction can be "up", "down" or "both". This determines what part of the calculation will be returned
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
 def userplane_active_millis(chunk, subscriber_ips, resolution_time, silence_period, min_report_time, direction):
@@ -184,10 +188,11 @@ def _active_time(chunk, min_report_time, resolution_time, silence_period):
 
 # This function calculates the estimated highest throughput reached during a chunk in upload/download direction
 # @param chunk A list of packets from the desired time frame to perform calculations on.
-# @param subscriber_ip The IP of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param subscriber_ips The IP's of the subscriber. This will be used to determine the meaning of "upload" and "download".
 # @param resolution_time The time unit to express the active_time parameter
 # @param silence_period Treshold to determine which delta's to report as active time
 # @param min_report_time Time that will be counted as active time when silence_period is exceeded
+# @param direction can be "up", "down" or "both". This determines what part of the calculation will be returned
 # @return Returns a dictionary with results. Can easily be serialized to JSON.
 #
 def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silence_period, subscriber_ips, direction):
@@ -261,7 +266,11 @@ def userplane_max_throughput_kbps(chunk, min_report_time, resolution_time, silen
                 'userplane_download_max_throughput_kbps': math.ceil(max(download_throughputs))}
 
 
-# wyd with missing syn packet?
+# This function calculates the time between the first TCP syn packet and the first data packet in a chunk.
+# If the first syn packet is not included in the chunk, this function will return 0.
+# @param chunk the chunk to perform calculations on
+# @return Returns a dictionary with results. Can easily be serialized to JSON.
+#
 def ttfb_usec(chunk):
 
     # tunnel layer
@@ -302,15 +311,27 @@ def ttfb_usec(chunk):
     return {'userplane_ttfb_usec': result}
 
 
+# This function calculates the amount of TCP retransmissions in a chunk
+# @param chunk the chunk to perform calculations on
+# @param subscriber_ips The IP's of the subscriber. This will be used to determine the meaning of "upload" and "download".
+# @param direction can be "up", "down" or "both". This determines what part of the calculation will be returned
+# @return Returns a dictionary with results. Can easily be serialized to JSON.
+#
 def retransmitted_packets_count(chunk, subscriber_ips, direction):
+
+    # The tunnel layer
+    tunnel_layer = 5
+
     sequence_numbers = set()
     retransmitted_up_count = 0
     retransmitted_down_count = 0
 
+    # Loop over all packets. If the packet has a payload, check whether we have already seen the sequence number in the
+    # sequence number set. If we haven't, add the sequence number to the set.
     for i in range(0, len(chunk)):
-        if chunk[i][5].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(chunk[i], 5) != 0:
-            if chunk[i][5].getlayer('TCP').seq in sequence_numbers:
-                if chunk[i][5]["IP"].src in subscriber_ips:
+        if chunk[i][tunnel_layer].haslayer('TCP') and eff_byte_protocol_stacks.tcp_ip(chunk[i], tunnel_layer) != 0:
+            if chunk[i][tunnel_layer].getlayer('TCP').seq in sequence_numbers:
+                if chunk[i][tunnel_layer]["IP"].src in subscriber_ips:
 
                     retransmitted_up_count += 1
 
@@ -319,7 +340,7 @@ def retransmitted_packets_count(chunk, subscriber_ips, direction):
                     retransmitted_down_count += 1
 
             else:
-                sequence_numbers.add(chunk[i][5].getlayer('TCP').seq)
+                sequence_numbers.add(chunk[i][tunnel_layer].getlayer('TCP').seq)
 
     if direction == "up":
         return {'userplane_upload_retransmitted_packets': retransmitted_up_count}

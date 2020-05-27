@@ -41,14 +41,13 @@ def check_commandline_params(parser):
                         help="only run calculations for packets in tunnel with this UDP source/destination port")
 
     # Required arguments
-    parser.add_argument('pcap',
-                        help="subscriber session pcap file")
     required_group = parser.add_argument_group(title="required arguments")
     required_group.add_argument('-i', '--ip-adress',
                                 help="ip adress of the subsciber (the client)",
                                 nargs='+',
                                 dest='ip',
                                 required=True)
+    required_group.add_argument('pcap', help="subscriber session pcap file")
 
     # Output arguments
     output_group = parser.add_argument_group(title="output options",
@@ -65,7 +64,7 @@ def check_commandline_params(parser):
                               dest='bytes',
                               action="store_true")
     output_group.add_argument('-e', '--effective-bytes',
-                              help="Include GTP-U byte count in output",
+                              help="Include TCP/UDP payload byte count in output",
                               default=False,
                               dest='effectiveBytes',
                               action="store_true")
@@ -90,7 +89,7 @@ def check_commandline_params(parser):
                               dest='retransmitted_packets',
                               action="store_true")
     output_group.add_argument('-d', '--direction',
-                              help="Specify the direction (up, down, both) of the stats that will be included in output",
+                              help="Specify the direction (up, down, both) of the stats that will be included in output. Direction is relative to the client",
                               default="both",
                               dest='direction',)
 

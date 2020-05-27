@@ -43,16 +43,24 @@ def main():
     else:
         sys.exit("ERROR: invalid pcap file")
 
-    # Get direction
+    # Get direction filter
     direction = args.direction
 
     # Get port filters
-    tcp_port = args.tcp_port
-    udp_port = args.udp_port
+    if args.tcp_port >= 0:
+        tcp_port = args.tcp_port
+    else:
+        sys.exit("ERROR: TCP port is a negative number")
+
+    if args.udp_port >= 0:
+        udp_port = args.udp_port
+    else:
+        sys.exit("ERROR: UDP port is a negative number")
 
     # The netscout calculations expect chunks of 5 minutes so we subdivide the pcap in chunks of 5 minutes
     pcap_chunks = helpers.divide_in_chunks(pcap, 300.00)
 
+    # If the TCP/UDP filters were set, filter out packets that don't match
     if tcp_port != 0:
         portfilters.filter_tcp(pcap_chunks, tcp_port)
 
