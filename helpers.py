@@ -47,7 +47,7 @@ def check_commandline_params(parser):
                                 nargs='+',
                                 dest='ip',
                                 required=True)
-    required_group.add_argument('pcap', help="subscriber session pcap file")
+    required_group.add_argument('-p', help="subscriber session pcap file", dest='pcap')
 
     # Output arguments
     output_group = parser.add_argument_group(title="output options",
